@@ -1,31 +1,35 @@
 openapi: 3.0.3
 info:
-  title: Ensi Backend Skeleton (Replace me)
+  title: Users Backend Service
   contact:
     name: API Support
     url: https://ensi.tech/contacts
     email: mail@greensight.ru
   version: 1.0.0
-  description: Ensi Backend Skeleton Description (Replace me)
+  description: Users Backend Service Description
 servers:
   - url: /api/v1
 tags:
   - name: examples
     description: Тэг-пример
 paths:
-  /examples/{id}:
+  /mytables/{id}:
     get:
       tags:
-        - examples
-      operationId: getExample
-      x-lg-handler: 'App\Http\ApiV1\Modules\Foos\Controllers\FoosController@get'
-      x-lg-route-name: 'getExample'
+        - users
+      operationId: showTablesByUserId
+      x-lg-handler: 'App\Http\ApiV1\Modules\Users\Controllers\UsersController@get'
+      x-lg-route-name: 'showTablesByUserId'
       x-lg-skip-request-generation: true
-      summary: Получение объекта типа Example
-      description: Получение объекта типа Example
+      summary: Получение объекта типа Table
+      description: Получение объекта типа Table
       parameters:
-        - $ref: '#/components/parameters/PathId'
-        - $ref: '#/components/parameters/QueryInclude'
+        - name: userId
+          in: path
+          required: true
+          description: The id of the user to retrieve
+          schema:
+            type: integer
       responses:
         #"200":
           #description: Успешный ответ
@@ -33,6 +37,120 @@ paths:
           #  application/json:
           #    schema:
           #      $ref: './customers.yaml#/CustomerResponse'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+  /register:
+    post:
+      tags:
+        - users
+      operationId: registerNewUser
+      x-lg-handler: 'App\Http\ApiV1\Modules\Users\Controllers\UsersController@post'
+      x-lg-route-name: 'registerNewUser'
+      x-lg-skip-request-generation: true
+      summary: Registration of new user
+      description: Registration of new user
+      parameters:
+        - name: userName
+          in: path
+          required: true
+          description: The name of the user to retrieve
+          schema:
+            type: string
+        - name: userSurname
+          in: path
+          required: true
+          description: The surname of the user to retrieve
+          schema:
+            type: string
+        - name: userPassword
+          in: path
+          required: true
+          description: The password of the user to retrieve
+          schema:
+            type: string
+        - name: userPhone
+          in: path
+          required: true
+          description: The id of the pet to retrieve
+          schema:
+            type: string
+      responses:
+        #"200":
+        #description: Успешный ответ
+        # content:
+        #  application/json:
+        #    schema:
+        #      $ref: './customers.yaml#/CustomerResponse'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+  /auth:
+    post:
+      tags:
+        - users
+      operationId: authUser
+      x-lg-handler: 'App\Http\ApiV1\Modules\Users\Controllers\UsersController@post'
+      x-lg-route-name: 'authorizeNewUser'
+      x-lg-skip-request-generation: true
+      summary: Authorization of new user
+      description: Authorization of new user
+      parameters:
+        - name: userPassword
+          in: path
+          required: true
+          description: The password of the user to retrieve
+          schema:
+            type: string
+        - name: userPhone
+          in: path
+          required: true
+          description: The id of the pet to retrieve
+          schema:
+            type: string
+      responses:
+        #"200":
+        #description: Успешный ответ
+        # content:
+        #  application/json:
+        #    schema:
+        #      $ref: './customers.yaml#/CustomerResponse'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/ServerError'
+  /bookTable:
+    post:
+      tags:
+        - users
+      operationId: bookTable
+      x-lg-handler: 'App\Http\ApiV1\Modules\Users\Controllers\UsersController@post'
+      x-lg-route-name: 'authorizeNewUser'
+      x-lg-skip-request-generation: true
+      summary: Book new table
+      description: Book new table
+      parameters:
+        - name: userName
+          in: path
+          required: true
+          description: The name of the user to retrieve
+          schema:
+            type: string
+        - name: userSurname
+          in: path
+          required: true
+          description: The surname of the user to retrieve
+          schema:
+            type: string
+      responses:
+        #"200":
+        #description: Успешный ответ
+        # content:
+        #  application/json:
+        #    schema:
+        #      $ref: './customers.yaml#/CustomerResponse'
         "404":
           $ref: '#/components/responses/NotFound'
         "500":
