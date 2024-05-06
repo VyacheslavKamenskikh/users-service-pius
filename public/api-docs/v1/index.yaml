@@ -9,9 +9,6 @@ info:
   description: Users Backend Service Description
 servers:
   - url: /api/v1
-tags:
-  - name: examples
-    description: Тэг-пример
 paths:
   /mytables/{id}:
     get:
