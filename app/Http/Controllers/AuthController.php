@@ -2,35 +2,49 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Foundation\Auth\User;
+use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function postSignin(Request $request)
+    public function register(Request $request)
     {
-
-        if (!Auth::attempt($request->only('email', 'password'), $request->has('remember'))) {
-            var_dump($request);
-            echo 'Неправильный логин или пароль';
-        } else {
-            echo 'Вы успешно авторизовались';
-        }
+        $validator = Validator::make($request->only('name', 'email', 'password', 'password_confirmation'), [
+            'name' => ['required', 'min:2', 'max:50', 'string'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'min:6', 'max:255', 'confirmed', 'string'],
+        ]);
+        if ($validator->fails())
+            return response()->json($validator->errors(), 400);
+        $input = $request->only('name', 'email', 'password');
+        $input['password'] = Hash::make($request['password']);
+        $user = User::create($input);
+        $data =  [
+            'token' => $user->createToken('Sanctom+Socialite')->plainTextToken,
+            'user' => $user,
+        ];
+        return response()->json($data, 200);
     }
 
-    public function postReg(Request $request)
+    public function login(Request $request)
     {
-        $user = User::create([
-            'email' => $request->input('email'),
-            'name' => $request->input('name'),
-            'password' => bcrypt($request->input('password')),
+        $validator = Validator::make($request->only('email', 'password'), [
+            'email' => ['required', 'email', 'exists:users,email'],
+            'password' => ['required', 'min:6', 'max:255', 'string'],
         ]);
-
-        Auth::loginUsingId($user->id);
-
-        return redirect()
-            ->route('home')
-            ->with('success', 'Вы успешно зарегистрировались');
+        if ($validator->fails())
+            return response()->json($validator->errors(), 400);
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $user = $request->user();
+            $data =  [
+                'token' => $user->createToken('Sanctom+Socialite')->plainTextToken,
+                'user' => $user,
+            ];
+            return response()->json($data, 200);
+        }
     }
 }
