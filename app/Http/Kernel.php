@@ -5,6 +5,7 @@ namespace App\Http;
 use Ensi\LaravelInitialEventPropagation\ParseInitialEventHeaderMiddleware;
 use Ensi\LaravelInitialEventPropagation\SetInitialEventHttpMiddleware;
 use Ensi\LaravelMetrics\HttpMiddleware\HttpMetricsMiddleware;
+
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -31,7 +32,9 @@ class Kernel extends HttpKernel
      * @var array<string, array<int, class-string|string>>
      */
     protected $middlewareGroups = [
-        'api' => [],
+        'api' => [\Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+                  'throttle:api',
+                  \Illuminate\Routing\Middleware\SubstituteBindings::class,],
     ];
 
     /**
@@ -45,5 +48,10 @@ class Kernel extends HttpKernel
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+    ];
+
+    protected $routeMiddleware = [
+        'auth' => Authenticate::class,
+        'guest' => RedirectIfAuthenticated::class,
     ];
 }
